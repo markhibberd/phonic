@@ -11,6 +11,7 @@ PROD_CLS = gen/prod/classes
 TEST_CLS = gen/test/classes
 DIST = gen/dist
 JAR = ${DIST}/${MODULE}.jar
+JAR_SRC = ${DIST}/${MODULE}-src.jar
 TAR = ${DIST}/${MODULE}-${VERSION}.tar
 VERSION = 0.1
 MANIFEST = ${ETC}/MANIFEST.MF
@@ -31,12 +32,15 @@ test: compile
 ${JAR}: compile ${DIST_MANIFEST} ${DIST}
 	jar cfm ${JAR} ${DIST_MANIFEST} -C ${PROD_CLS} .
 
-${TAR}: ${JAR} ${TAR_IMAGE} ${TAR_IMAGE}/lib/depend 
-	cp lib/run/*.jar ${TAR_IMAGE}/lib/depend && \
-	cp ${JAR} ${TAR_IMAGE}/lib && \
-	cp LICENSE COPYING FEATURES README ${TAR_IMAGE} && \
-	cp -r ${ETC}/licenses ${TAR_IMAGE} && \
-	tar cfz ${TAR} -C ${GEN}/image .
+${JAR_SRC}: ${DIST}
+        jar cf ${JAR_SRC} -C ${PROD} .
+
+${TAR}: ${JAR} ${JAR_SRC} ${TAR_IMAGE}
+        cp lib/run/*.jar ${TAR_IMAGE}/lib && \
+        cp ${JAR} ${JAR_SRC} ${TAR_IMAGE} && \
+        cp LICENSE COPYING FEATURES README ${TAR_IMAGE} && \
+        cp -r ${ETC}/licenses ${TAR_IMAGE} && \
+        tar cfz ${TAR} -C ${GEN}/image .
 
 dist: clean ${TAR}
 
@@ -56,7 +60,7 @@ depend:
 	cp ../lever/gen/dist/lever.jar lib/run/. && \
 	cp ../lever/LICENSE etc/licenses/lever
 
-${GEN} ${GEN}/tmp ${PROD_CLS} ${TEST_CLS} ${DIST} ${LIB} ${TAR_IMAGE} ${TAR_IMAGE}/lib ${TAR_IMAGE}/lib/depend:
+${GEN} ${GEN}/tmp ${PROD_CLS} ${TEST_CLS} ${DIST} ${LIB} ${TAR_IMAGE} ${TAR_IMAGE}/lib:
 	mkdir -p $@
 
 clean:
