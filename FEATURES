@@ -1,0 +1,5 @@
+Sun 21 Nov 2010 21:13:27 EST
+
+Naive sound engine.
+Voice playables using freetts.
+WAV playables using javax.sound.
