@@ -52,6 +52,10 @@ size:
 simian:
 	echo "implement me"
 
+depend:
+	cp ../lever/gen/dist/lever.jar lib/run/. && \
+	cp ../lever/LICENSE etc/licenses/lever
+
 ${GEN} ${GEN}/tmp ${PROD_CLS} ${TEST_CLS} ${DIST} ${LIB} ${TAR_IMAGE} ${TAR_IMAGE}/lib ${TAR_IMAGE}/lib/depend:
 	mkdir -p $@
 

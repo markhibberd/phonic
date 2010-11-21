@@ -2,7 +2,9 @@ package io.mth.phonic
 
 import java.net.URL
 import com.sun.speech.freetts.VoiceManager
-import javax.sound.sampled.{SourceDataLine, DataLine, AudioSystem}
+import io.mth.lever.Lever._
+import java.io.Closeable
+import javax.sound.sampled._
 
 trait Playable {
   def play
@@ -51,23 +53,32 @@ object Playable {
   def play(url: URL) = new Playable {
     def play = {
       val in = AudioSystem.getAudioInputStream(url)
-      val format = in.getFormat
-      val info = new DataLine.Info(classOf[SourceDataLine], format)
-      val line = AudioSystem.getLine(info).asInstanceOf[SourceDataLine]
-      line.open(format)
-      line.start
-      try {
-        val buffer = new Array[Byte](1024 * 4096)
-        (Iterator continually (in.read(buffer, 0, buffer.length))).
-                takeWhile(_ != -1).
-                foreach(line.write(buffer, 0, _))
-      } finally {
-        line.drain
-        line.close
+      val lineout = line(in)
+      using2(in, line2closeable(lineout)) { i => o =>
+        pipe(i, lineout, 1024 * 4096)
       }
-
     }
 
     override def toString = "play [" + url + "]"
+
+    def line(in: AudioInputStream) = {
+      val format = in.getFormat
+      val info = lineinfo(format)
+      val line = AudioSystem.getLine(info).asInstanceOf[SourceDataLine]
+      line.open(format)
+      line.start
+      line
+    }
+
+    def lineinfo(format: AudioFormat) = new DataLine.Info(classOf[SourceDataLine], format)
+
+    implicit def line2closeable(l: SourceDataLine) = new Closeable {
+      def close = {
+        l.drain
+        l.close
+      }
+    }
   }
+
+
 }

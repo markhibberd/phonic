@@ -30,6 +30,7 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="module" module-name="lever" />
     <orderEntry type="module-library">
       <library name="libs">
         <CLASSES>
