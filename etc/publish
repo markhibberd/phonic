@@ -1,0 +1,4 @@
+#!/bin/sh 
+
+rsync -aH --stats --exclude \*~ www/ web@mth.io:phonic.mth.io/data
+
