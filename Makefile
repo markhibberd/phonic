@@ -33,16 +33,19 @@ ${JAR}: compile ${DIST_MANIFEST} ${DIST}
 	jar cfm ${JAR} ${DIST_MANIFEST} -C ${PROD_CLS} .
 
 ${JAR_SRC}: ${DIST}
-        jar cf ${JAR_SRC} -C ${PROD} .
+	jar cf ${JAR_SRC} -C ${PROD} .
 
-${TAR}: ${JAR} ${JAR_SRC} ${TAR_IMAGE}
-        cp lib/run/*.jar ${TAR_IMAGE}/lib && \
-        cp ${JAR} ${JAR_SRC} ${TAR_IMAGE} && \
-        cp LICENSE COPYING FEATURES README ${TAR_IMAGE} && \
-        cp -r ${ETC}/licenses ${TAR_IMAGE} && \
-        tar cfz ${TAR} -C ${GEN}/image .
+${TAR}: ${JAR} ${JAR_SRC} ${TAR_IMAGE}/lib
+	cp lib/run/*.jar ${TAR_IMAGE}/lib && \
+	cp ${JAR} ${JAR_SRC} ${TAR_IMAGE} && \
+	cp LICENSE COPYING FEATURES README ${TAR_IMAGE} && \
+	cp -r ${ETC}/licenses ${TAR_IMAGE} && \
+	tar cfz ${TAR} -C ${GEN}/image .
 
 dist: clean ${TAR}
+
+publish:
+	rsync -aH --stats --exclude \*~ ${ETC}/www/ web@mth.io:phonic.mth.io/data
 
 ${DIST_MANIFEST}: ${GEN}
 	sed -e 's/VERSION/${VERSION}/' ${MANIFEST} > ${DIST_MANIFEST}
